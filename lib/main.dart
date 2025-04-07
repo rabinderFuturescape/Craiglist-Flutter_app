@@ -22,6 +22,20 @@ import 'features/product/data/repositories/product_repository_impl.dart';
 import 'features/product/domain/repositories/product_repository.dart';
 import 'features/product/data/datasources/product_remote_data_source.dart';
 
+// Import Looking For feature
+import 'features/looking_for/data/datasources/looking_for_remote_data_source_impl.dart';
+import 'features/looking_for/data/repositories/looking_for_repository_impl.dart';
+import 'features/looking_for/domain/repositories/looking_for_repository.dart';
+import 'features/looking_for/domain/usecases/check_expired_items.dart';
+import 'features/looking_for/domain/usecases/create_looking_for_item.dart';
+import 'features/looking_for/domain/usecases/delete_looking_for_item.dart';
+import 'features/looking_for/domain/usecases/get_looking_for_items.dart';
+import 'features/looking_for/domain/usecases/get_user_looking_for_items.dart';
+import 'features/looking_for/domain/usecases/update_looking_for_item.dart';
+import 'features/looking_for/presentation/bloc/looking_for_bloc.dart';
+import 'features/looking_for/presentation/pages/looking_for_list_page.dart';
+import 'core/usecases/usecase.dart';
+
 /// Main entry point of the application.
 ///
 /// This initializes all dependencies and starts the app with proper authentication flow.
@@ -41,12 +55,26 @@ void main() async {
 
   // Set up data sources
   final productRemoteDataSource = ProductRemoteDataSourceImpl(apiService: apiService);
+  final lookingForRemoteDataSource = LookingForRemoteDataSourceImpl(apiService: apiService);
 
   // Set up repositories
   final productRepository = ProductRepositoryImpl(
     remoteDataSource: productRemoteDataSource,
     networkInfo: networkInfo,
   );
+
+  final lookingForRepository = LookingForRepositoryImpl(
+    remoteDataSource: lookingForRemoteDataSource,
+    networkInfo: networkInfo,
+  );
+
+  // Set up Looking For use cases
+  final getLookingForItems = GetLookingForItems(lookingForRepository);
+  final getUserLookingForItems = GetUserLookingForItems(lookingForRepository);
+  final createLookingForItem = CreateLookingForItem(lookingForRepository);
+  final updateLookingForItem = UpdateLookingForItem(lookingForRepository);
+  final deleteLookingForItem = DeleteLookingForItem(lookingForRepository);
+  final checkExpiredItems = CheckExpiredItems(lookingForRepository);
 
   final authLocalDataSource = AuthLocalDataSourceImpl(sharedPreferences);
   final authRepository = AuthRepositoryImpl(authLocalDataSource);
@@ -62,6 +90,12 @@ void main() async {
     signUp: signUp,
     authService: authService,
     productRepository: productRepository,
+    getLookingForItems: getLookingForItems,
+    getUserLookingForItems: getUserLookingForItems,
+    createLookingForItem: createLookingForItem,
+    updateLookingForItem: updateLookingForItem,
+    deleteLookingForItem: deleteLookingForItem,
+    checkExpiredItems: checkExpiredItems,
   ));
 }
 
@@ -74,6 +108,12 @@ class MyApp extends StatelessWidget {
   final sign_up.SignUp signUp;
   final AuthenticationService authService;
   final ProductRepository productRepository;
+  final GetLookingForItems getLookingForItems;
+  final GetUserLookingForItems getUserLookingForItems;
+  final CreateLookingForItem createLookingForItem;
+  final UpdateLookingForItem updateLookingForItem;
+  final DeleteLookingForItem deleteLookingForItem;
+  final CheckExpiredItems checkExpiredItems;
 
   const MyApp({
     Key? key,
@@ -81,6 +121,12 @@ class MyApp extends StatelessWidget {
     required this.signUp,
     required this.authService,
     required this.productRepository,
+    required this.getLookingForItems,
+    required this.getUserLookingForItems,
+    required this.createLookingForItem,
+    required this.updateLookingForItem,
+    required this.deleteLookingForItem,
+    required this.checkExpiredItems,
   }) : super(key: key);
 
   @override
@@ -101,6 +147,16 @@ class MyApp extends StatelessWidget {
         BlocProvider<CartBloc>(
           create: (context) => CartBloc(),
         ),
+        BlocProvider<LookingForBloc>(
+          create: (context) => LookingForBloc(
+            getLookingForItems: getLookingForItems,
+            getUserLookingForItems: getUserLookingForItems,
+            createLookingForItem: createLookingForItem,
+            updateLookingForItem: updateLookingForItem,
+            deleteLookingForItem: deleteLookingForItem,
+            checkExpiredItems: checkExpiredItems,
+          ),
+        ),
       ],
       child: MaterialApp(
         title: 'Craigslist Flutter App',
@@ -112,6 +168,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/products': (context) => const ProductListingPage(),
           '/cart': (context) => const CartPage(),
+          '/looking-for': (context) => const LookingForListPage(),
         },
       ),
     );

@@ -9,6 +9,7 @@ import '../widgets/search_filter_bar.dart';
 
 // Import standardized components
 import '../../../../core/presentation/widgets/layout/app_bar_widget.dart';
+import '../../../../core/presentation/widgets/layout/app_drawer.dart';
 import '../../../../core/presentation/widgets/layout/loading_indicator.dart';
 import '../../../../core/presentation/widgets/layout/error_display.dart';
 import '../../../../core/presentation/widgets/layout/empty_state.dart';
@@ -23,6 +24,7 @@ class ProductListingPage extends StatelessWidget {
     return BlocBuilder<ProductBloc, ProductState>(
       builder: (context, state) {
         return Scaffold(
+          drawer: const AppDrawer(),
           appBar: AppBarWidget(
             title: 'Products',
             actions: [
