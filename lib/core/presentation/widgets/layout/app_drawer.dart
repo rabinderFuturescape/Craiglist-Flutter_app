@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../../../features/auth/presentation/pages/sign_in_page.dart';
 import '../../../../features/auth/presentation/pages/user_profile_page.dart';
-import '../../../../features/product/presentation/pages/product_listing_page.dart';
-import '../../../../features/cart/presentation/pages/cart_page.dart';
-import '../../../../features/looking_for/presentation/pages/looking_for_list_page.dart';
+
 import '../../../theme/app_colors.dart';
 import '../../../theme/text_styles.dart';
 
@@ -16,7 +14,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Drawer(
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -25,8 +23,8 @@ class AppDrawer extends StatelessWidget {
             children: [
               // Drawer header with user info or sign in button
               _buildDrawerHeader(context, state, isDarkMode),
-              
-              // Home / Products
+
+              // Home
               ListTile(
                 leading: Icon(
                   Icons.home,
@@ -40,28 +38,46 @@ class AppDrawer extends StatelessWidget {
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushReplacementNamed(context, '/products');
+                  Navigator.pushReplacementNamed(context, '/home');
                 },
               ),
-              
-              // Looking For
+
+              // Offer to Sell
               ListTile(
                 leading: Icon(
-                  Icons.search,
+                  Icons.sell,
                   color: isDarkMode ? AppColors.primaryDark : AppColors.primary,
                 ),
                 title: Text(
-                  'Looking For',
+                  'Offer to Sell',
                   style: AppTextStyles.body1.copyWith(
                     color: isDarkMode ? Colors.white : AppColors.textPrimary,
                   ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushNamed(context, '/looking-for');
+                  Navigator.pushReplacementNamed(context, '/products');
                 },
               ),
-              
+
+              // Looking to Buy
+              ListTile(
+                leading: Icon(
+                  Icons.search,
+                  color: isDarkMode ? AppColors.primaryDark : AppColors.primary,
+                ),
+                title: Text(
+                  'Looking to Buy',
+                  style: AppTextStyles.body1.copyWith(
+                    color: isDarkMode ? Colors.white : AppColors.textPrimary,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, '/looking-for');
+                },
+              ),
+
               // Cart
               ListTile(
                 leading: Icon(
@@ -79,9 +95,9 @@ class AppDrawer extends StatelessWidget {
                   Navigator.pushNamed(context, '/cart');
                 },
               ),
-              
+
               const Divider(),
-              
+
               // Profile (only shown if authenticated)
               if (state is Authenticated)
                 ListTile(
@@ -105,7 +121,7 @@ class AppDrawer extends StatelessWidget {
                     );
                   },
                 ),
-              
+
               // Sign out (only shown if authenticated)
               if (state is Authenticated)
                 ListTile(
@@ -147,7 +163,7 @@ class AppDrawer extends StatelessWidget {
                     );
                   },
                 ),
-              
+
               // Sign in (only shown if not authenticated)
               if (state is! Authenticated)
                 ListTile(
@@ -171,9 +187,9 @@ class AppDrawer extends StatelessWidget {
                     );
                   },
                 ),
-              
+
               const Divider(),
-              
+
               // About
               ListTile(
                 leading: Icon(
@@ -224,7 +240,7 @@ class AppDrawer extends StatelessWidget {
           // App logo
           const FlutterLogo(size: 48),
           const SizedBox(height: 16),
-          
+
           // User info or app name
           if (state is Authenticated)
             Text(
@@ -242,7 +258,7 @@ class AppDrawer extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-          
+
           // User email or tagline
           if (state is Authenticated && state.email != null)
             Text(

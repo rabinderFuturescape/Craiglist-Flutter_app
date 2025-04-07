@@ -5,6 +5,7 @@ import '../error/failures.dart';
 import 'secure_storage_service.dart';
 import 'token_manager.dart';
 import 'package:flutter/foundation.dart';
+import '../error/exceptions.dart';
 
 class ApiService {
   final String baseUrl;
@@ -271,5 +272,71 @@ class ApiService {
 
     // Retry the original request with the new token
     return await requestFunction();
+  }
+
+  Future<dynamic> get(String endpoint) async {
+    try {
+      final response = await _client.get(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  Future<dynamic> post(String endpoint, {dynamic body}) async {
+    try {
+      final response = await _client.post(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  Future<dynamic> put(String endpoint, {dynamic body}) async {
+    try {
+      final response = await _client.put(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  Future<dynamic> delete(String endpoint) async {
+    try {
+      final response = await _client.delete(
+        Uri.parse('$baseUrl$endpoint'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      return _handleResponse(response);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  dynamic _handleResponse(http.Response response) {
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.body.isEmpty) return null;
+      return jsonDecode(response.body);
+    } else {
+      throw ServerException(
+        message: 'Request failed with status: ${response.statusCode}',
+        statusCode: response.statusCode,
+      );
+    }
   }
 }

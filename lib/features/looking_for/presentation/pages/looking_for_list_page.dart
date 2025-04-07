@@ -13,7 +13,9 @@ import 'create_looking_for_page.dart';
 
 /// Page to display a list of "Looking For" items
 class LookingForListPage extends StatefulWidget {
-  const LookingForListPage({Key? key}) : super(key: key);
+  final bool isTabView;
+
+  const LookingForListPage({Key? key, this.isTabView = false}) : super(key: key);
 
   @override
   State<LookingForListPage> createState() => _LookingForListPageState();
@@ -31,37 +33,33 @@ class _LookingForListPageState extends State<LookingForListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(),
-      appBar: const AppBarWidget(
-        title: 'Looking For Items',
-      ),
-      body: BlocConsumer<LookingForBloc, LookingForState>(
-        buildWhen: (previous, current) => current is! ExpiredItemsChecked && current is! LookingForItemDeleted,
-        listener: (context, state) {
-          // Show a snackbar when items are expired
-          if (state is ExpiredItemsChecked && state.expiredCount > 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${state.expiredCount} expired items have been removed'),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          }
+    // Create the main content widget
+    Widget content = BlocConsumer<LookingForBloc, LookingForState>(
+      buildWhen: (previous, current) => current is! ExpiredItemsChecked && current is! LookingForItemDeleted,
+      listener: (context, state) {
+        // Show a snackbar when items are expired
+        if (state is ExpiredItemsChecked && state.expiredCount > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${state.expiredCount} expired items have been removed'),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
 
-          // Show a snackbar when an item is deleted
-          if (state is LookingForItemDeleted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Item deleted successfully'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-            // Reload the items
-            context.read<LookingForBloc>().add(const LoadLookingForItems());
-          }
-        },
-        builder: (context, state) {
+        // Show a snackbar when an item is deleted
+        if (state is LookingForItemDeleted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Item deleted successfully'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+          // Reload the items
+          context.read<LookingForBloc>().add(const LoadLookingForItems());
+        }
+      },
+      builder: (context, state) {
           // Show loading indicator
           if (state is LookingForInitial || state is LookingForLoading) {
             return const LoadingIndicator(message: 'Loading items...');
@@ -192,33 +190,45 @@ class _LookingForListPageState extends State<LookingForListPage> {
           // Default case
           return const SizedBox();
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Products',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Looking For',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Cart',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushReplacementNamed(context, '/products');
-          } else if (index == 1) {
-            // Already on Looking For page
-          } else if (index == 2) {
-            Navigator.pushNamed(context, '/cart');
-          }
-        },
-      ),
-    );
+      );
+
+    // Return either the tab view or the standalone page
+    if (widget.isTabView) {
+      return content;
+    } else {
+      return Scaffold(
+        drawer: const AppDrawer(),
+        appBar: const AppBarWidget(
+          title: 'Looking to Buy',
+        ),
+        body: content,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: 1,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Products',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Looking For',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Cart',
+            ),
+          ],
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.pushReplacementNamed(context, '/products');
+            } else if (index == 1) {
+              // Already on Looking For page
+            } else if (index == 2) {
+              Navigator.pushNamed(context, '/cart');
+            }
+          },
+        ),
+      );
+    }
   }
 }

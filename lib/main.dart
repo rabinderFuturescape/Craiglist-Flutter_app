@@ -7,6 +7,7 @@ import 'features/auth/presentation/bloc/auth_bloc.dart' as auth_bloc;
 import 'features/product/presentation/bloc/product_bloc.dart' as product_bloc;
 import 'features/cart/presentation/bloc/cart_bloc.dart';
 import 'features/product/presentation/pages/product_listing_page.dart';
+import 'core/presentation/pages/main_navigation_page.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
@@ -17,7 +18,9 @@ import 'core/services/api_service.dart';
 import 'core/services/secure_storage_service.dart';
 import 'core/services/token_manager.dart';
 import 'core/network/network_info.dart';
+
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'features/product/data/repositories/product_repository_impl.dart';
 import 'features/product/domain/repositories/product_repository.dart';
 import 'features/product/data/datasources/product_remote_data_source.dart';
@@ -25,7 +28,7 @@ import 'features/product/data/datasources/product_remote_data_source.dart';
 // Import Looking For feature
 import 'features/looking_for/data/datasources/looking_for_remote_data_source_impl.dart';
 import 'features/looking_for/data/repositories/looking_for_repository_impl.dart';
-import 'features/looking_for/domain/repositories/looking_for_repository.dart';
+
 import 'features/looking_for/domain/usecases/check_expired_items.dart';
 import 'features/looking_for/domain/usecases/create_looking_for_item.dart';
 import 'features/looking_for/domain/usecases/delete_looking_for_item.dart';
@@ -34,7 +37,7 @@ import 'features/looking_for/domain/usecases/get_user_looking_for_items.dart';
 import 'features/looking_for/domain/usecases/update_looking_for_item.dart';
 import 'features/looking_for/presentation/bloc/looking_for_bloc.dart';
 import 'features/looking_for/presentation/pages/looking_for_list_page.dart';
-import 'core/usecases/usecase.dart';
+
 
 /// Main entry point of the application.
 ///
@@ -51,7 +54,10 @@ void main() async {
   await tokenManager.initialize(); // Initialize token manager
 
   final apiService = ApiService(secureStorage: secureStorage, tokenManager: tokenManager);
-  final networkInfo = NetworkInfoImpl(InternetConnectionChecker());
+  // Create network info based on platform
+  final networkInfo = kIsWeb
+      ? WebNetworkInfo()
+      : NetworkInfoImpl(InternetConnectionChecker());
 
   // Set up data sources
   final productRemoteDataSource = ProductRemoteDataSourceImpl(apiService: apiService);
@@ -163,9 +169,10 @@ class MyApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         debugShowCheckedModeBanner: false,
-        home: const ProductListingPage(),
+        home: const MainNavigationPage(),
         // Routes without the redundant '/' entry
         routes: {
+          '/home': (context) => const MainNavigationPage(),
           '/products': (context) => const ProductListingPage(),
           '/cart': (context) => const CartPage(),
           '/looking-for': (context) => const LookingForListPage(),

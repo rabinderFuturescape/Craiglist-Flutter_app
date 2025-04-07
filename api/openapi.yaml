@@ -1,0 +1,1828 @@
+openapi: 3.0.3
+info:
+  title: Craigslist Flutter App API
+  description: API for the Craigslist Flutter App, providing endpoints for authentication, products, and looking for items
+  version: 1.0.0
+  contact:
+    name: Futurescape Tech
+    email: support@futurescapetech.com
+servers:
+  - url: https://api.craigslist-app.example.com/v1
+    description: Production server
+  - url: https://staging-api.craigslist-app.example.com/v1
+    description: Staging server
+  - url: https://dev-api.craigslist-app.example.com/v1
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: Authentication operations
+  - name: Products
+    description: Product listing operations
+  - name: Looking For
+    description: Looking for item operations
+  - name: Cart
+    description: Shopping cart operations
+  - name: Checkout
+    description: Checkout and order operations
+  - name: Notifications
+    description: User notification operations
+  - name: User
+    description: User profile operations
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login a user
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Invalid refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout a user
+      operationId: logoutUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get all products
+      operationId: getProducts
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: minPrice
+          in: query
+          description: Minimum price
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          description: Maximum price
+          schema:
+            type: number
+        - name: sortBy
+          in: query
+          description: Sort by field
+          schema:
+            type: string
+            enum: [price, date, title]
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: search
+          in: query
+          description: Search term
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}:
+    get:
+      tags:
+        - Products
+      summary: Get a product by ID
+      operationId: getProductById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/create:
+    post:
+      tags:
+        - Products
+      summary: Create a new product
+      operationId: createProduct
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}/update:
+    put:
+      tags:
+        - Products
+      summary: Update a product
+      operationId: updateProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not the owner of the product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/{id}/delete:
+    delete:
+      tags:
+        - Products
+      summary: Delete a product
+      operationId: deleteProduct
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not the owner of the product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products/user/{userId}:
+    get:
+      tags:
+        - Products
+      summary: Get products by user ID
+      operationId: getProductsByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of products by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for:
+    get:
+      tags:
+        - Looking For
+      summary: Get all looking for items
+      operationId: getLookingForItems
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+        - name: category
+          in: query
+          description: Filter by category
+          schema:
+            type: string
+        - name: maxBudget
+          in: query
+          description: Maximum budget
+          schema:
+            type: number
+        - name: sortBy
+          in: query
+          description: Sort by field
+          schema:
+            type: string
+            enum: [budget, date, title]
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: search
+          in: query
+          description: Search term
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of looking for items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookingForItemsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/{id}:
+    get:
+      tags:
+        - Looking For
+      summary: Get a looking for item by ID
+      operationId: getLookingForItemById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Looking for item ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Looking for item details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookingForItemResponse'
+        '404':
+          description: Looking for item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/create:
+    post:
+      tags:
+        - Looking For
+      summary: Create a new looking for item
+      operationId: createLookingForItem
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LookingForItemRequest'
+      responses:
+        '201':
+          description: Looking for item created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookingForItemResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/{id}/update:
+    put:
+      tags:
+        - Looking For
+      summary: Update a looking for item
+      operationId: updateLookingForItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Looking for item ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LookingForItemRequest'
+      responses:
+        '200':
+          description: Looking for item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookingForItemResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not the owner of the looking for item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Looking for item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/{id}/delete:
+    delete:
+      tags:
+        - Looking For
+      summary: Delete a looking for item
+      operationId: deleteLookingForItem
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Looking for item ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Looking for item deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not the owner of the looking for item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Looking for item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/user/{userId}:
+    get:
+      tags:
+        - Looking For
+      summary: Get looking for items by user ID
+      operationId: getLookingForItemsByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of looking for items by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LookingForItemsResponse'
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /looking-for/check-expired:
+    post:
+      tags:
+        - Looking For
+      summary: Check and update expired looking for items
+      operationId: checkExpiredLookingForItems
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Expired items checked and updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpiredItemsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      operationId: getUserProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /user/profile/update:
+    put:
+      tags:
+        - User
+      summary: Update user profile
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart:
+    get:
+      tags:
+        - Cart
+      summary: Get user's cart
+      operationId: getCart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's cart items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/add:
+    post:
+      tags:
+        - Cart
+      summary: Add item to cart
+      operationId: addToCart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '200':
+          description: Item added to cart successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/update:
+    put:
+      tags:
+        - Cart
+      summary: Update cart item quantity
+      operationId: updateCartItem
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCartItemRequest'
+      responses:
+        '200':
+          description: Cart item updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/remove/{productId}:
+    delete:
+      tags:
+        - Cart
+      summary: Remove item from cart
+      operationId: removeFromCart
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Product ID to remove from cart
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Item removed from cart successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cart/clear:
+    delete:
+      tags:
+        - Cart
+      summary: Clear all items from cart
+      operationId: clearCart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cart cleared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /checkout:
+    post:
+      tags:
+        - Checkout
+      summary: Create a new order from cart items
+      operationId: createOrder
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Cart is empty
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders:
+    get:
+      tags:
+        - Checkout
+      summary: Get user's order history
+      operationId: getOrderHistory
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: User's order history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders/{id}:
+    get:
+      tags:
+        - Checkout
+      summary: Get order details by ID
+      operationId: getOrderById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Order ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden - Not the owner of the order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user's notifications
+      operationId: getNotifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            default: 20
+        - name: unreadOnly
+          in: query
+          description: Filter to show only unread notifications
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: User's notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/{id}/read:
+    put:
+      tags:
+        - Notifications
+      summary: Mark a notification as read
+      operationId: markNotificationAsRead
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Notification ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/read-all:
+    put:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      operationId: markAllNotificationsAsRead
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: Password123!
+        name:
+          type: string
+          example: John Doe
+        phone:
+          type: string
+          example: "+1234567890"
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: Password123!
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: user123
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          example: John Doe
+        phone:
+          type: string
+          example: "+1234567890"
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+
+    ProductRequest:
+      type: object
+      required:
+        - title
+        - description
+        - price
+        - categories
+      properties:
+        title:
+          type: string
+          example: iPhone 13 Pro - Like New
+        description:
+          type: string
+          example: 1 year old iPhone 13 Pro in excellent condition
+        price:
+          type: number
+          format: float
+          example: 75000
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: uri
+          example: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["Electronics", "Mobile Phones"]
+        location:
+          type: string
+          example: Andheri East, Mumbai
+        condition:
+          type: string
+          example: Like New
+        specifications:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            Storage: 256 GB
+            Color: Pacific Blue
+            Warranty: 6 months remaining
+        expiryDate:
+          type: string
+          format: date-time
+          example: 2023-12-31T00:00:00Z
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: prod123
+        title:
+          type: string
+          example: iPhone 13 Pro - Like New
+        description:
+          type: string
+          example: 1 year old iPhone 13 Pro in excellent condition
+        price:
+          type: number
+          format: float
+          example: 75000
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: uri
+          example: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["Electronics", "Mobile Phones"]
+        location:
+          type: string
+          example: Andheri East, Mumbai
+        datePosted:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        expiryDate:
+          type: string
+          format: date-time
+          example: 2023-12-31T00:00:00Z
+        isAvailable:
+          type: boolean
+          example: true
+        sellerId:
+          type: string
+          example: user123
+        sellerName:
+          type: string
+          example: Jane Smith
+        sellerContact:
+          type: string
+          example: "+919876543211"
+        condition:
+          type: string
+          example: Like New
+        specifications:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            Storage: 256 GB
+            Color: Pacific Blue
+            Warranty: 6 months remaining
+        rating:
+          type: number
+          format: float
+          example: 4.5
+        reviewCount:
+          type: integer
+          example: 12
+
+    ProductResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Product'
+
+    ProductsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/Product'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    LookingForItemRequest:
+      type: object
+      required:
+        - title
+        - description
+        - maxBudget
+        - categories
+        - expiryDate
+      properties:
+        title:
+          type: string
+          example: Looking for iPhone 12 or 13
+        description:
+          type: string
+          example: I'm looking for an iPhone 12 or 13 in good condition
+        maxBudget:
+          type: number
+          format: float
+          example: 50000
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["Electronics", "Mobile Phones"]
+        location:
+          type: string
+          example: Andheri East, Mumbai
+        contactInfo:
+          type: string
+          example: "+919876543211 or email@example.com"
+        preferredConditions:
+          type: array
+          items:
+            type: string
+          example: ["Good", "Like New"]
+        expiryDate:
+          type: string
+          format: date-time
+          example: 2023-12-31T00:00:00Z
+
+    LookingForItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: lf123
+        userId:
+          type: string
+          example: user123
+        userName:
+          type: string
+          example: John Doe
+        title:
+          type: string
+          example: Looking for iPhone 12 or 13
+        description:
+          type: string
+          example: I'm looking for an iPhone 12 or 13 in good condition
+        maxBudget:
+          type: number
+          format: float
+          example: 50000
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["Electronics", "Mobile Phones"]
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        expiryDate:
+          type: string
+          format: date-time
+          example: 2023-12-31T00:00:00Z
+        isActive:
+          type: boolean
+          example: true
+        location:
+          type: string
+          example: Andheri East, Mumbai
+        contactInfo:
+          type: string
+          example: "+919876543211 or email@example.com"
+        preferredConditions:
+          type: array
+          items:
+            type: string
+          example: ["Good", "Like New"]
+        isExpired:
+          type: boolean
+          example: false
+
+    LookingForItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/LookingForItem'
+
+    LookingForItemsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/LookingForItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    ExpiredItemsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            expiredCount:
+              type: integer
+              example: 5
+            message:
+              type: string
+              example: "5 items marked as expired"
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        phone:
+          type: string
+          example: "+1234567890"
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        currentPassword:
+          type: string
+          format: password
+          example: OldPassword123!
+        newPassword:
+          type: string
+          format: password
+          example: NewPassword123!
+
+    UserProfileResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/User'
+
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          example: 5
+        totalItems:
+          type: integer
+          example: 100
+        itemsPerPage:
+          type: integer
+          example: 20
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation completed successfully
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: Invalid input
+        message:
+          type: string
+          example: Detailed error message
+        statusCode:
+          type: integer
+          example: 400
+
+    CartItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: prod123
+        product:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          format: float
+          example: 75000
+        totalPrice:
+          type: number
+          format: float
+          example: 150000
+
+    Cart:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        totalItems:
+          type: integer
+          example: 3
+        totalPrice:
+          type: number
+          format: float
+          example: 175000
+
+    CartResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Cart'
+
+    AddToCartRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: prod123
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+
+    UpdateCartItemRequest:
+      type: object
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          example: prod123
+        quantity:
+          type: integer
+          minimum: 1
+          example: 3
+
+    CheckoutRequest:
+      type: object
+      required:
+        - shippingAddress
+        - paymentMethod
+      properties:
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethod:
+          type: string
+          enum: [CREDIT_CARD, DEBIT_CARD, UPI, CASH_ON_DELIVERY]
+          example: CREDIT_CARD
+        paymentDetails:
+          type: object
+          properties:
+            cardNumber:
+              type: string
+              example: "4111111111111111"
+            cardHolderName:
+              type: string
+              example: "John Doe"
+            expiryMonth:
+              type: string
+              example: "12"
+            expiryYear:
+              type: string
+              example: "2025"
+            cvv:
+              type: string
+              example: "123"
+        notes:
+          type: string
+          example: "Please deliver after 6 PM"
+
+    Address:
+      type: object
+      required:
+        - fullName
+        - addressLine1
+        - city
+        - state
+        - postalCode
+        - country
+        - phone
+      properties:
+        fullName:
+          type: string
+          example: "John Doe"
+        addressLine1:
+          type: string
+          example: "123 Main Street"
+        addressLine2:
+          type: string
+          example: "Apt 4B"
+        city:
+          type: string
+          example: "Mumbai"
+        state:
+          type: string
+          example: "Maharashtra"
+        postalCode:
+          type: string
+          example: "400001"
+        country:
+          type: string
+          example: "India"
+        phone:
+          type: string
+          example: "+919876543210"
+
+    OrderItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          example: prod123
+        productTitle:
+          type: string
+          example: "iPhone 13 Pro - Like New"
+        quantity:
+          type: integer
+          example: 2
+        price:
+          type: number
+          format: float
+          example: 75000
+        totalPrice:
+          type: number
+          format: float
+          example: 150000
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          example: order123
+        userId:
+          type: string
+          example: user123
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalItems:
+          type: integer
+          example: 3
+        totalPrice:
+          type: number
+          format: float
+          example: 175000
+        shippingAddress:
+          $ref: '#/components/schemas/Address'
+        paymentMethod:
+          type: string
+          enum: [CREDIT_CARD, DEBIT_CARD, UPI, CASH_ON_DELIVERY]
+          example: CREDIT_CARD
+        paymentStatus:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED, REFUNDED]
+          example: COMPLETED
+        orderStatus:
+          type: string
+          enum: [PLACED, PROCESSING, SHIPPED, DELIVERED, CANCELLED]
+          example: PROCESSING
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-02T00:00:00Z
+        notes:
+          type: string
+          example: "Please deliver after 6 PM"
+
+    OrderResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Order'
+
+    OrdersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            orders:
+              type: array
+              items:
+                $ref: '#/components/schemas/Order'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          example: notif123
+        userId:
+          type: string
+          example: user123
+        title:
+          type: string
+          example: "Order Shipped"
+        message:
+          type: string
+          example: "Your order #order123 has been shipped and will be delivered in 2-3 days."
+        type:
+          type: string
+          enum: [ORDER, PRODUCT, SYSTEM, LOOKING_FOR]
+          example: ORDER
+        referenceId:
+          type: string
+          example: order123
+        isRead:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+
+    NotificationsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            notifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/Notification'
+            unreadCount:
+              type: integer
+              example: 5
+            pagination:
+              $ref: '#/components/schemas/Pagination'
