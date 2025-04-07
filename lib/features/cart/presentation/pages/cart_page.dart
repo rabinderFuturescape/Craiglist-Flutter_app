@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/tailwind_utils.dart';
+import '../../../../core/presentation/widgets/layout/app_bar_widget.dart';
+import '../../../../core/presentation/widgets/layout/app_drawer.dart';
+import '../../../../core/presentation/widgets/buttons/primary_button.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/text_styles.dart';
 import '../bloc/cart_bloc.dart';
 import '../../../checkout/presentation/pages/checkout_page.dart';
 import '../../../auth/presentation/pages/sign_in_page.dart';
@@ -12,12 +17,9 @@ class CartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Shopping Cart'),
+      drawer: const AppDrawer(),
+      appBar: AppBarWidget(
+        title: 'Shopping Cart',
         actions: [
           TextButton.icon(
             onPressed: () {
@@ -294,13 +296,18 @@ class CartPage extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                             vertical: Tailwind.spacing4,
                           ),
+                          backgroundColor: Theme.of(context).brightness == Brightness.dark
+                              ? AppColors.primaryDark
+                              : AppColors.primary,
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: Tailwind.borderRadiusLg,
                           ),
                         ),
                         child: Text(
                           'Proceed to Checkout',
-                          style: Tailwind.textBase(context).copyWith(
+                          style: AppTextStyles.button.copyWith(
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -311,6 +318,32 @@ class CartPage extends StatelessWidget {
               ),
             ],
           );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 2,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Looking For',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+        ],
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.pushReplacementNamed(context, '/products');
+          } else if (index == 1) {
+            Navigator.pushNamed(context, '/looking-for');
+          } else if (index == 2) {
+            // Already on Cart page
+          }
         },
       ),
     );

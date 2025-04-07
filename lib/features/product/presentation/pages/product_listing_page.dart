@@ -9,6 +9,7 @@ import '../widgets/search_filter_bar.dart';
 
 // Import standardized components
 import '../../../../core/presentation/widgets/layout/app_bar_widget.dart';
+import '../../../../core/presentation/widgets/layout/app_drawer.dart';
 import '../../../../core/presentation/widgets/layout/loading_indicator.dart';
 import '../../../../core/presentation/widgets/layout/error_display.dart';
 import '../../../../core/presentation/widgets/layout/empty_state.dart';
@@ -16,44 +17,38 @@ import '../../../../core/presentation/widgets/layout/responsive_grid.dart';
 import '../../../../core/presentation/widgets/cards/product_card.dart';
 
 class ProductListingPage extends StatelessWidget {
-  const ProductListingPage({Key? key}) : super(key: key);
+  final bool isTabView;
+
+  const ProductListingPage({Key? key, this.isTabView = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ProductBloc, ProductState>(
       builder: (context, state) {
-        return Scaffold(
-          appBar: AppBarWidget(
-            title: 'Products',
-            actions: [
-              IconButton(
-                icon: Icon(
-                  state.isGridView ? Icons.view_list : Icons.grid_view,
-                ),
-                onPressed: () {
-                  context.read<ProductBloc>().add(const ToggleViewMode());
-                },
-                tooltip: state.isGridView
-                    ? 'Switch to List View'
-                    : 'Switch to Grid View',
-              ),
-              IconButton(
-                icon: const Icon(Icons.shopping_cart),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CartPage(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          body: Column(
+        if (isTabView) {
+          // Tab view layout (without Scaffold, AppBar, etc.)
+          return Column(
             children: [
               // Search and Filter Bar
-              const SearchFilterBar(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Row(
+                  children: [
+                    Expanded(child: const SearchFilterBar()),
+                    IconButton(
+                      icon: Icon(
+                        state.isGridView ? Icons.view_list : Icons.grid_view,
+                      ),
+                      onPressed: () {
+                        context.read<ProductBloc>().add(const ToggleViewMode());
+                      },
+                      tooltip: state.isGridView
+                          ? 'Switch to List View'
+                          : 'Switch to Grid View',
+                    ),
+                  ],
+                ),
+              ),
 
               // Product List with Refresh Indicator
               Expanded(
@@ -65,19 +60,67 @@ class ProductListingPage extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CreateListingPage(),
+          );
+        } else {
+          // Standalone page layout (with Scaffold, AppBar, etc.)
+          return Scaffold(
+            drawer: const AppDrawer(),
+            appBar: AppBarWidget(
+              title: 'Offer to Sell',
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    state.isGridView ? Icons.view_list : Icons.grid_view,
+                  ),
+                  onPressed: () {
+                    context.read<ProductBloc>().add(const ToggleViewMode());
+                  },
+                  tooltip: state.isGridView
+                      ? 'Switch to List View'
+                      : 'Switch to Grid View',
                 ),
-              );
-            },
-            child: const Icon(Icons.add),
-          ),
-        );
+                IconButton(
+                  icon: const Icon(Icons.shopping_cart),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CartPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            body: Column(
+              children: [
+                // Search and Filter Bar
+                const SearchFilterBar(),
+
+                // Product List with Refresh Indicator
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<ProductBloc>().add(const LoadProducts());
+                    },
+                    child: _buildBody(context, state),
+                  ),
+                ),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CreateListingPage(),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          );
+        }
       },
     );
   }

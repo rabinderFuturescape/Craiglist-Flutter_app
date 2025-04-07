@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="400" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="400" y="40" font-family="Arial" font-size="20" text-anchor="middle" font-weight="bold">Parent App Authentication Flow</text>
+  
+  <!-- Boxes -->
+  <g>
+    <!-- Parent App -->
+    <rect x="100" y="100" width="150" height="80" fill="#bbdefb" stroke="#1565c0" stroke-width="2" rx="5" />
+    <text x="175" y="145" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Parent App</text>
+    
+    <!-- Auth Provider -->
+    <rect x="325" y="100" width="150" height="80" fill="#c8e6c9" stroke="#2e7d32" stroke-width="2" rx="5" />
+    <text x="400" y="145" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Auth Provider</text>
+    
+    <!-- Craigslist App -->
+    <rect x="550" y="100" width="150" height="80" fill="#ffccbc" stroke="#e64a19" stroke-width="2" rx="5" />
+    <text x="625" y="145" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Craigslist App</text>
+    
+    <!-- API Service -->
+    <rect x="550" y="250" width="150" height="80" fill="#d1c4e9" stroke="#4527a0" stroke-width="2" rx="5" />
+    <text x="625" y="295" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">API Service</text>
+  </g>
+  
+  <!-- Arrows -->
+  <g stroke="#424242" stroke-width="2" marker-end="url(#arrowhead)">
+    <!-- Parent App to Auth Provider -->
+    <line x1="250" y1="140" x2="325" y2="140" />
+    <text x="287" y="130" font-family="Arial" font-size="12" text-anchor="middle">Tokens</text>
+    
+    <!-- Auth Provider to Craigslist App -->
+    <line x1="475" y1="140" x2="550" y2="140" />
+    <text x="512" y="130" font-family="Arial" font-size="12" text-anchor="middle">Auth State</text>
+    
+    <!-- Craigslist App to API Service -->
+    <line x1="625" y1="180" x2="625" y2="250" />
+    <text x="650" y="215" font-family="Arial" font-size="12" text-anchor="middle">Use Token</text>
+    
+    <!-- API Service to Auth Provider (refresh) -->
+    <path d="M 550 290 C 450 290 450 140 325 140" fill="none" stroke="#424242" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+    <text x="450" y="310" font-family="Arial" font-size="12" text-anchor="middle">Token Refresh</text>
+  </g>
+  
+  <!-- Arrow Marker -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#424242" />
+    </marker>
+  </defs>
+</svg>

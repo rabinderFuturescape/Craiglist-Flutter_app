@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="600" fill="#f8f9fa" />
+  
+  <!-- Title -->
+  <text x="600" y="50" font-family="Arial" font-size="24" text-anchor="middle" font-weight="bold">Craigslist Flutter App Screenshots</text>
+  
+  <!-- Phone Mockups -->
+  <g>
+    <!-- Phone 1 - Offer to Sell -->
+    <rect x="100" y="100" width="250" height="450" rx="20" fill="#ffffff" stroke="#cccccc" stroke-width="2" />
+    <rect x="110" y="110" width="230" height="430" rx="15" fill="#e3f2fd" />
+    <text x="225" y="140" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Offer to Sell</text>
+    
+    <!-- App Bar -->
+    <rect x="110" y="110" width="230" height="50" rx="15" fill="#1565c0" />
+    <text x="225" y="140" font-family="Arial" font-size="16" text-anchor="middle" fill="white" font-weight="bold">Offer to Sell</text>
+    
+    <!-- Tab Bar -->
+    <rect x="110" y="160" width="230" height="40" fill="#bbdefb" />
+    <rect x="110" y="160" width="115" height="40" fill="#1565c0" />
+    <text x="167" y="185" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Sell</text>
+    <text x="282" y="185" font-family="Arial" font-size="14" text-anchor="middle" fill="#1565c0">Buy</text>
+    
+    <!-- Product Cards -->
+    <rect x="120" y="210" width="100" height="120" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="120" y="210" width="100" height="70" rx="5" fill="#e0e0e0" />
+    <text x="170" y="300" font-family="Arial" font-size="12" text-anchor="middle">iPhone 13</text>
+    <text x="170" y="320" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold">$699</text>
+    
+    <rect x="230" y="210" width="100" height="120" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="230" y="210" width="100" height="70" rx="5" fill="#e0e0e0" />
+    <text x="280" y="300" font-family="Arial" font-size="12" text-anchor="middle">MacBook Pro</text>
+    <text x="280" y="320" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold">$1299</text>
+    
+    <rect x="120" y="340" width="100" height="120" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="120" y="340" width="100" height="70" rx="5" fill="#e0e0e0" />
+    <text x="170" y="430" font-family="Arial" font-size="12" text-anchor="middle">iPad Air</text>
+    <text x="170" y="450" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold">$499</text>
+    
+    <rect x="230" y="340" width="100" height="120" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="230" y="340" width="100" height="70" rx="5" fill="#e0e0e0" />
+    <text x="280" y="430" font-family="Arial" font-size="12" text-anchor="middle">AirPods Pro</text>
+    <text x="280" y="450" font-family="Arial" font-size="12" text-anchor="middle" font-weight="bold">$249</text>
+    
+    <!-- Phone 2 - Looking to Buy -->
+    <rect x="400" y="100" width="250" height="450" rx="20" fill="#ffffff" stroke="#cccccc" stroke-width="2" />
+    <rect x="410" y="110" width="230" height="430" rx="15" fill="#e8f5e9" />
+    
+    <!-- App Bar -->
+    <rect x="410" y="110" width="230" height="50" rx="15" fill="#2e7d32" />
+    <text x="525" y="140" font-family="Arial" font-size="16" text-anchor="middle" fill="white" font-weight="bold">Looking to Buy</text>
+    
+    <!-- Tab Bar -->
+    <rect x="410" y="160" width="230" height="40" fill="#c8e6c9" />
+    <rect x="525" y="160" width="115" height="40" fill="#2e7d32" />
+    <text x="467" y="185" font-family="Arial" font-size="14" text-anchor="middle" fill="#2e7d32">Sell</text>
+    <text x="582" y="185" font-family="Arial" font-size="14" text-anchor="middle" fill="white">Buy</text>
+    
+    <!-- Looking For Cards -->
+    <rect x="420" y="210" width="210" height="100" rx="5" fill="white" stroke="#cccccc" />
+    <text x="525" y="235" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Looking for iPhone 12</text>
+    <text x="525" y="260" font-family="Arial" font-size="12" text-anchor="middle">Budget: $500</text>
+    <text x="525" y="280" font-family="Arial" font-size="12" text-anchor="middle">Posted by: John D.</text>
+    <text x="525" y="300" font-family="Arial" font-size="12" text-anchor="middle">Location: New York</text>
+    
+    <rect x="420" y="320" width="210" height="100" rx="5" fill="white" stroke="#cccccc" />
+    <text x="525" y="345" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">Need Gaming Laptop</text>
+    <text x="525" y="370" font-family="Arial" font-size="12" text-anchor="middle">Budget: $1000</text>
+    <text x="525" y="390" font-family="Arial" font-size="12" text-anchor="middle">Posted by: Sarah M.</text>
+    <text x="525" y="410" font-family="Arial" font-size="12" text-anchor="middle">Location: Chicago</text>
+    
+    <!-- Phone 3 - Product Details -->
+    <rect x="700" y="100" width="250" height="450" rx="20" fill="#ffffff" stroke="#cccccc" stroke-width="2" />
+    <rect x="710" y="110" width="230" height="430" rx="15" fill="#fff3e0" />
+    
+    <!-- App Bar -->
+    <rect x="710" y="110" width="230" height="50" rx="15" fill="#e65100" />
+    <text x="825" y="140" font-family="Arial" font-size="16" text-anchor="middle" fill="white" font-weight="bold">Product Details</text>
+    
+    <!-- Product Image -->
+    <rect x="720" y="170" width="210" height="150" rx="5" fill="#e0e0e0" />
+    
+    <!-- Product Info -->
+    <text x="825" y="340" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold">iPhone 13 Pro</text>
+    <text x="825" y="370" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">$999</text>
+    <text x="825" y="400" font-family="Arial" font-size="14" text-anchor="middle">Like new, 256GB, Pacific Blue</text>
+    <text x="825" y="420" font-family="Arial" font-size="14" text-anchor="middle">Location: San Francisco</text>
+    <text x="825" y="440" font-family="Arial" font-size="14" text-anchor="middle">Seller: Mike T.</text>
+    
+    <!-- Add to Cart Button -->
+    <rect x="750" y="460" width="150" height="40" rx="20" fill="#e65100" />
+    <text x="825" y="485" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">Add to Cart</text>
+    
+    <!-- Phone 4 - Cart -->
+    <rect x="1000" y="100" width="250" height="450" rx="20" fill="#ffffff" stroke="#cccccc" stroke-width="2" />
+    <rect x="1010" y="110" width="230" height="430" rx="15" fill="#f3e5f5" />
+    
+    <!-- App Bar -->
+    <rect x="1010" y="110" width="230" height="50" rx="15" fill="#6a1b9a" />
+    <text x="1125" y="140" font-family="Arial" font-size="16" text-anchor="middle" fill="white" font-weight="bold">Shopping Cart</text>
+    
+    <!-- Cart Items -->
+    <rect x="1020" y="170" width="210" height="80" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="1030" y="180" width="60" height="60" rx="5" fill="#e0e0e0" />
+    <text x="1125" y="195" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">iPhone 13 Pro</text>
+    <text x="1125" y="215" font-family="Arial" font-size="12" text-anchor="middle">$999</text>
+    <text x="1125" y="235" font-family="Arial" font-size="12" text-anchor="middle">Quantity: 1</text>
+    
+    <rect x="1020" y="260" width="210" height="80" rx="5" fill="white" stroke="#cccccc" />
+    <rect x="1030" y="270" width="60" height="60" rx="5" fill="#e0e0e0" />
+    <text x="1125" y="285" font-family="Arial" font-size="14" text-anchor="middle" font-weight="bold">AirPods Pro</text>
+    <text x="1125" y="305" font-family="Arial" font-size="12" text-anchor="middle">$249</text>
+    <text x="1125" y="325" font-family="Arial" font-size="12" text-anchor="middle">Quantity: 1</text>
+    
+    <!-- Total -->
+    <rect x="1020" y="350" width="210" height="50" rx="5" fill="#f3e5f5" stroke="#6a1b9a" />
+    <text x="1060" y="380" font-family="Arial" font-size="14" text-anchor="start">Total:</text>
+    <text x="1200" y="380" font-family="Arial" font-size="14" text-anchor="end" font-weight="bold">$1,248</text>
+    
+    <!-- Checkout Button -->
+    <rect x="1050" y="420" width="150" height="40" rx="20" fill="#6a1b9a" />
+    <text x="1125" y="445" font-family="Arial" font-size="14" text-anchor="middle" fill="white" font-weight="bold">Checkout</text>
+  </g>
+  
+  <!-- Placeholder Text -->
+  <text x="600" y="580" font-family="Arial" font-size="12" text-anchor="middle" fill="#666666">App screenshots will be updated with actual images</text>
+</svg>
