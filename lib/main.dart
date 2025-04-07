@@ -12,21 +12,19 @@ import 'features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/domain/services/authentication_service.dart';
-import 'features/auth/data/services/authentication_service_impl.dart';
 import 'features/cart/presentation/pages/cart_page.dart';
-import 'core/services/api_service.dart';
 import 'core/services/secure_storage_service.dart';
 import 'core/services/token_manager.dart';
 import 'core/network/network_info.dart';
+import 'core/services/supabase_client.dart';
+import 'features/auth/data/services/supabase_auth_service.dart';
+import 'features/product/data/datasources/product_supabase_data_source.dart';
+import 'features/looking_for/data/datasources/looking_for_supabase_data_source.dart';
 
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'features/product/data/repositories/product_repository_impl.dart';
 import 'features/product/domain/repositories/product_repository.dart';
-import 'features/product/data/datasources/product_remote_data_source.dart';
-
-// Import Looking For feature
-import 'features/looking_for/data/datasources/looking_for_remote_data_source_impl.dart';
 import 'features/looking_for/data/repositories/looking_for_repository_impl.dart';
 
 import 'features/looking_for/domain/usecases/check_expired_items.dart';
@@ -46,6 +44,10 @@ import 'features/looking_for/presentation/pages/looking_for_list_page.dart';
 /// appropriate screen.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase
+  await AppSupabaseClient.initialize();
+
   final sharedPreferences = await SharedPreferences.getInstance();
 
   // Set up dependencies
@@ -53,15 +55,20 @@ void main() async {
   final tokenManager = TokenManager(secureStorage: secureStorage);
   await tokenManager.initialize(); // Initialize token manager
 
-  final apiService = ApiService(secureStorage: secureStorage, tokenManager: tokenManager);
   // Create network info based on platform
   final networkInfo = kIsWeb
       ? WebNetworkInfo()
       : NetworkInfoImpl(InternetConnectionChecker());
 
+  // Set up Supabase client
+  final supabaseClient = AppSupabaseClient.instance;
+
+  // Set up authentication service
+  final authService = SupabaseAuthService(supabaseClient: supabaseClient);
+
   // Set up data sources
-  final productRemoteDataSource = ProductRemoteDataSourceImpl(apiService: apiService);
-  final lookingForRemoteDataSource = LookingForRemoteDataSourceImpl(apiService: apiService);
+  final productRemoteDataSource = ProductSupabaseDataSource(supabaseClient: supabaseClient);
+  final lookingForRemoteDataSource = LookingForSupabaseDataSource(supabaseClient: supabaseClient);
 
   // Set up repositories
   final productRepository = ProductRepositoryImpl(
@@ -86,10 +93,6 @@ void main() async {
   final authRepository = AuthRepositoryImpl(authLocalDataSource);
   final signIn = sign_in.SignIn(authRepository);
   final signUp = sign_up.SignUp(authRepository);
-  final authService = AuthenticationServiceImpl(
-    secureStorage: secureStorage,
-    tokenManager: tokenManager,
-  );
 
   runApp(MyApp(
     signIn: signIn,
